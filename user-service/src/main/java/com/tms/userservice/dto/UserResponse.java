@@ -3,11 +3,12 @@ package com.tms.userservice.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class UserResponse {
+public class UserResponse implements Serializable {
 
     private String id;
 

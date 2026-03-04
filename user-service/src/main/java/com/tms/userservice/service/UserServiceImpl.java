@@ -8,6 +8,9 @@ import com.tms.userservice.exception.UserAlreadyExistsException;
 import com.tms.userservice.model.User;
 import com.tms.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -21,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @CacheEvict(value = {"users", "usersList"}, allEntries = true)
     public UserResponse createUser(UserRequest request) {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -39,6 +43,7 @@ public class UserServiceImpl implements UserService {
         return mapToResponse(savedUser);
     }
 
+    @Cacheable(value = "users", key = "#id")
     public UserResponse getUserById(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
@@ -46,6 +51,7 @@ public class UserServiceImpl implements UserService {
         return mapToResponse(user);
     }
 
+    @Cacheable(value = "usersList")
     public List<UserResponse> getAllUsers() {
 
         List<User> users = userRepository.findAll();
@@ -56,6 +62,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CachePut(value = "users", key = "#id")
+    @CacheEvict(value = {"users", "usersList"}, allEntries = true)
     public UserResponse updateUser(String id, UserRequest request) {
 
         User user = userRepository.findById(id)
@@ -83,6 +91,8 @@ public class UserServiceImpl implements UserService {
         return mapToResponse(updatedUser);
     }
 
+    @Override
+    @CacheEvict(value = {"users", "usersList"}, key = "#id", allEntries = true)
     public void deleteUser(String id) {
 
         if (!userRepository.existsById(id)) {
