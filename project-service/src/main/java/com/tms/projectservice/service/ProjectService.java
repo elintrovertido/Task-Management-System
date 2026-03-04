@@ -16,4 +16,6 @@ public interface ProjectService {
     ProjectResponse updateProject(String id, ProjectRequest request);
 
     void deleteProject(String id);
+
+    ProjectResponse assignUsersToProject(String projectId, List<String> members);
 }

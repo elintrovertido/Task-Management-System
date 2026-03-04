@@ -47,4 +47,12 @@ public class ProjectController {
         projectService.deleteProject(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{projectId}/members")
+    public ResponseEntity<ProjectResponse> assignUsersToProject(
+            @PathVariable String projectId,
+            @RequestBody List<String> members) {
+
+        return ResponseEntity.ok(projectService.assignUsersToProject(projectId, members));
+    }
 }
