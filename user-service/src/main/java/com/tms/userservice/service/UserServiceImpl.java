@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @CacheEvict(value = {"users", "usersList"}, allEntries = true)
+    @CacheEvict(value = {"users", "usersList"}, key = "#id", allEntries = true)
     public UserResponse createUser(UserRequest request) {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -62,8 +62,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CachePut(value = "users", key = "#id")
-    @CacheEvict(value = {"users", "usersList"}, allEntries = true)
+    @CacheEvict(value = {"users", "usersList"}, key = "#id", allEntries = true)
     public UserResponse updateUser(String id, UserRequest request) {
 
         User user = userRepository.findById(id)
