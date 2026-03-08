@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: task-service
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: task-service
+
+server:
+  port: 8083
+  servlet:
+    context-path: /TASK-SERVICE/
+
+logging:
+  level:
+    root: DEBUG
+    org.springframework: DEBUG
+    com.tms: DEBUG
+
