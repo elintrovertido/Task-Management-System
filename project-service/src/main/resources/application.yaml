@@ -1,13 +1,21 @@
 spring:
   application:
     name: project-service
-
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        service-name: project-service
+        enabled: true
+        health-check-path: /PROJECT-SERVICE/actuator/health
+        health-check-interval: 10s
+        prefer-ip-address: true
   data:
     mongodb:
       host: localhost
       port: 27017
       database: project-service
-
     redis:
       host: localhost
       port: 6379
@@ -15,4 +23,18 @@ spring:
 server:
   port: 8082
   servlet:
-    context-path: PROJECT-SERVICE
+    context-path: /PROJECT-SERVICE
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+

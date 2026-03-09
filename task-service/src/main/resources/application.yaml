@@ -1,6 +1,15 @@
 spring:
   application:
     name: task-service
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        service-name: task-service
+        health-check-path: /TASK-SERVICE/actuator/health
+        health-check-interval: 10s
+        prefer-ip-address: true
   data:
     mongodb:
       host: localhost
@@ -10,11 +19,8 @@ spring:
 server:
   port: 8083
   servlet:
-    context-path: /TASK-SERVICE/
+    context-path: /TASK-SERVICE
 
 logging:
   level:
-    root: DEBUG
-    org.springframework: DEBUG
-    com.tms: DEBUG
-
+    root: INFO
