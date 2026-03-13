@@ -2,9 +2,11 @@ package com.tms.userservice.controller;
 
 import com.tms.userservice.dto.UserRequest;
 import com.tms.userservice.dto.UserResponse;
+import com.tms.userservice.dto.ValidateRequest;
 import com.tms.userservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.protocol.ResponseServer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

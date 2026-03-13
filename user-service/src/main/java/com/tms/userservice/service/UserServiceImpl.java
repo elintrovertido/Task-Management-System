@@ -3,6 +3,7 @@ package com.tms.userservice.service;
 import com.tms.userservice.constants.Role;
 import com.tms.userservice.dto.UserRequest;
 import com.tms.userservice.dto.UserResponse;
+import com.tms.userservice.dto.ValidateRequest;
 import com.tms.userservice.exception.ResourceNotFoundException;
 import com.tms.userservice.exception.UserAlreadyExistsException;
 import com.tms.userservice.model.User;

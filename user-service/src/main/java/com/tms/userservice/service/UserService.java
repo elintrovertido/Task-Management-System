@@ -2,6 +2,7 @@ package com.tms.userservice.service;
 
 import com.tms.userservice.dto.UserRequest;
 import com.tms.userservice.dto.UserResponse;
+import com.tms.userservice.dto.ValidateRequest;
 
 import java.util.List;
 
