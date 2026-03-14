@@ -1,21 +1,21 @@
 package com.tms.userservice.exception;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Data
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class ErrorResponse {
-
-    private LocalDateTime timestamp;
-
+    private LocalDateTime timeStamp;
     private int status;
-
     private String error;
-
     private String message;
-
     private String path;
+    private List<RequestError> requestErrors;
 }

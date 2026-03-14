@@ -12,7 +12,7 @@ public class RegisterResponse implements Serializable {
 
     private String id;
 
-    private String name;
+    private String userName;
 
     private String email;
 

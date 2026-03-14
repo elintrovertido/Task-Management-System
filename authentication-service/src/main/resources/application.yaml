@@ -4,3 +4,8 @@ spring:
 
 server:
   port: 8085
+
+jwt:
+  secret: dGFzay1tYW5hZ2VtZW50LXN5c3RlbS1zZWNyZXQta2V5LXRoYXQtaXMtbG9uZy1lbm91Z2g=
+  # This is a Base64 encoded key. Generate a proper one for production:
+  # openssl rand -base64 32

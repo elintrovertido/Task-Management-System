@@ -1,11 +1,13 @@
 package com.tms.userservice.model;
 
 import com.tms.userservice.constants.Role;
+import com.tms.userservice.util.Roles;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -19,7 +21,7 @@ public class User extends Auditable {
     private String id;
 
     @Field(value = "name")
-    private String name;
+    private String userName;
 
     @Field(value = "email")
     private String email;
@@ -28,5 +30,5 @@ public class User extends Auditable {
     private String password;
 
     @Field(value = "role")
-    private Role role;
+    private Roles roles;
 }

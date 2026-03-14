@@ -4,10 +4,12 @@ import com.tms.userservice.constants.Role;
 import com.tms.userservice.dto.UserRequest;
 import com.tms.userservice.dto.UserResponse;
 import com.tms.userservice.dto.ValidateRequest;
+import com.tms.userservice.exception.DataProcessingException;
 import com.tms.userservice.exception.ResourceNotFoundException;
 import com.tms.userservice.exception.UserAlreadyExistsException;
 import com.tms.userservice.model.User;
 import com.tms.userservice.repository.UserRepository;
+import com.tms.userservice.util.Roles;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -28,20 +30,34 @@ public class UserServiceImpl implements UserService {
     @CacheEvict(value = {"users", "usersList"}, key = "#id", allEntries = true)
     public UserResponse createUser(UserRequest request) {
 
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new UserAlreadyExistsException("User already exists with email: " + request.getEmail());
         }
 
         User user = User.builder()
-                .name(request.getName())
+                .userName(request.getUserName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.valueOf(request.getRole()))
+                .roles(Roles.valueOf(request.getRole()))
                 .build();
 
         User savedUser = userRepository.save(user);
 
         return mapToResponse(savedUser);
+    }
+
+    public User getUserByEmail(String email) {
+        try {
+            if (!StringUtils.hasText(email)) {
+                throw new IllegalArgumentException("Email is requred");
+            }
+
+            return userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResourceNotFoundException("User Not Found with Email: " + email));
+
+        } catch (Exception ex) {
+            throw new DataProcessingException("Failed to Process : " + ex.getMessage());
+        }
     }
 
     @Cacheable(value = "users", key = "#id")
@@ -79,14 +95,14 @@ public class UserServiceImpl implements UserService {
                     });
         }
 
-        user.setName(request.getName());
+        user.setUserName(request.getUserName());
         user.setEmail(request.getEmail());
 
         if (StringUtils.hasText(request.getEmail())) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
 
-        user.setRole(Role.valueOf(request.getRole()));
+        user.setRoles(Roles.valueOf(request.getRole()));
         User updatedUser = userRepository.save(user);
         return mapToResponse(updatedUser);
     }
@@ -107,9 +123,9 @@ public class UserServiceImpl implements UserService {
 
         return UserResponse.builder()
                 .id(user.getId())
-                .name(user.getName())
+                .userName(user.getUserName())
                 .email(user.getEmail())
-                .role(user.getRole().name())
+                .role(user.getRoles().name())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
