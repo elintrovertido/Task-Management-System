@@ -34,6 +34,10 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException("User already exists with email: " + request.getEmail());
         }
 
+        if(userRepository.existsByUserName(request.getUserName())){
+            throw new UserAlreadyExistsException("User already exists with userName: " + request.getUserName());
+        }
+
         User user = User.builder()
                 .userName(request.getUserName())
                 .email(request.getEmail())
@@ -93,6 +97,14 @@ public class UserServiceImpl implements UserService {
                         throw new UserAlreadyExistsException(
                                 "User already exists with email: " + request.getEmail());
                     });
+        }
+
+        if (!user.getUserName().equals(request.getUserName())) {
+
+            boolean userExists = userRepository.existsByUserName(request.getUserName());
+            if(userExists) throw new UserAlreadyExistsException(
+                    "User already exists with userName: " + request.getUserName());
+
         }
 
         user.setUserName(request.getUserName());

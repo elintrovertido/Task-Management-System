@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.NOT_FOUND.value())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error("Failed to Process Data")
                 .message(ex.getMessage())
                 .path(request.getRequestURI())

@@ -1,6 +1,6 @@
-package com.tms.userservice.config;
+package com.tms.projectservice.config;
 
-import com.tms.userservice.service.JwtService;
+import com.tms.projectservice.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

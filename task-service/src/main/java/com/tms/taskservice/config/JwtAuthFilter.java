@@ -1,6 +1,6 @@
-package com.tms.userservice.config;
+package com.tms.taskservice.config;
 
-import com.tms.userservice.service.JwtService;
+import com.tms.taskservice.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,7 +55,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             // Use a simple principal holder
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                    username, "", authorities);
+                    email, "", authorities);
 
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(

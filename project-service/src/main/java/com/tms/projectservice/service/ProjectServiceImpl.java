@@ -1,5 +1,6 @@
 package com.tms.projectservice.service;
 
+import com.tms.projectservice.dto.AssignMembersRequest;
 import com.tms.projectservice.dto.ProjectRequest;
 import com.tms.projectservice.dto.ProjectResponse;
 import com.tms.projectservice.exception.DataProcessingException;
@@ -11,26 +12,36 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ProjectServiceImpl implements ProjectService {
 
+    public static final String ADD = "add";
+    public static final String REMOVE = "remove";
     private final ProjectRepository projectRepository;
 
     @Override
-    @CachePut(value = {"projects", "projectsList"}, key = "#id")
+    @Caching(
+            put = { @CachePut(value = "project", key = "#result.id") },
+            evict = { @CacheEvict(value = "projectList", allEntries = true) }
+    )
     public ProjectResponse createProject(ProjectRequest request) {
 
         try {
             log.info("Creating project with name: {}", request.getName());
 
-            Project project = Project.builder().name(request.getName()).description(request.getDescription()).members(request.getMembers()).build();
+            Project project = Project.builder()
+                    .name(request.getName())
+                    .description(request.getDescription())
+                    .members(request.getMembers())
+                    .build();
 
             Project saved = projectRepository.save(project);
 
@@ -40,12 +51,12 @@ public class ProjectServiceImpl implements ProjectService {
 
         } catch (Exception e) {
             log.error("Error occurred while creating project", e);
-            throw new RuntimeException("Failed to create project");
+            throw new DataProcessingException(e.getMessage());
         }
     }
 
     @Override
-    @Cacheable(value = "projects", key = "#id")
+    @Cacheable(value = "project", key = "#id")
     public ProjectResponse getProjectById(String id) {
 
         try {
@@ -61,12 +72,12 @@ public class ProjectServiceImpl implements ProjectService {
 
         } catch (Exception e) {
             log.error("Error fetching project with id: {}", id, e);
-            throw new RuntimeException("Failed to fetch project");
+            throw new DataProcessingException(e.getMessage());
         }
     }
 
     @Override
-    @Cacheable(value = "projectsList")
+    @Cacheable(value = "projectList")
     public List<ProjectResponse> getAllProjects() {
 
         try {
@@ -80,12 +91,15 @@ public class ProjectServiceImpl implements ProjectService {
 
         } catch (Exception e) {
             log.error("Error fetching all projects", e);
-            throw new RuntimeException("Failed to fetch projects");
+            throw new DataProcessingException(e.getMessage());
         }
     }
 
     @Override
-    @CacheEvict(value = {"projects", "projectsList"}, allEntries = true)
+    @Caching(
+            put = { @CachePut(value = "project", key = "#id") },
+            evict = { @CacheEvict(value = "projectList", allEntries = true) }
+    )
     public ProjectResponse updateProject(String id, ProjectRequest request) {
 
         try {
@@ -109,12 +123,15 @@ public class ProjectServiceImpl implements ProjectService {
 
         } catch (Exception e) {
             log.error("Error updating project with id: {}", id, e);
-            throw new RuntimeException("Failed to update project");
+            throw new DataProcessingException(e.getMessage());
         }
     }
 
     @Override
-    @CacheEvict(value = {"projects", "projectsList"}, key = "#id")
+    @Caching(evict = {
+            @CacheEvict(value = "project", key = "#id"),
+            @CacheEvict(value = "projectList", allEntries = true)
+    })
     public void deleteProject(String id) {
 
         try {
@@ -132,23 +149,38 @@ public class ProjectServiceImpl implements ProjectService {
 
         } catch (Exception e) {
             log.error("Error deleting project with id: {}", id, e);
-            throw new RuntimeException("Failed to delete project");
+            throw new DataProcessingException(e.getMessage());
         }
     }
 
     @Override
-    @CacheEvict(value = {"projects", "projectsList"}, allEntries = true)
-    public ProjectResponse assignUsersToProject(String projectId, List<String> members) {
+    @Caching(
+            put = { @CachePut(value = "project", key = "#projectId") },
+            evict = { @CacheEvict(value = "projectList", allEntries = true) }
+    )
+    public ProjectResponse assignUsersToProject(String projectId, AssignMembersRequest assignMembersRequest) {
 
         try {
-            log.info("Assigning users {} to project {}", members, projectId);
+            log.info("Assigning users {} to project {}", assignMembersRequest.getMembers(), projectId);
 
             Project project = projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + projectId));
+            List<String> existingMembers = project.getMembers() != null
+                    ? project.getMembers()
+                    : new ArrayList<>();
 
-            List<String> existingMembers = project.getMembers();
-            existingMembers.addAll(members);
-            List<String> updatedMembers = existingMembers.stream().distinct().toList();
-            project.setMembers(updatedMembers);
+            if (ADD.equalsIgnoreCase(assignMembersRequest.getOperation())) {
+                existingMembers.addAll(assignMembersRequest.getMembers());
+                List<String> updatedMembers = existingMembers.stream()
+                        .distinct()
+                        .toList();
+                project.setMembers(updatedMembers);
+            } else if (REMOVE.equalsIgnoreCase(assignMembersRequest.getOperation())) {
+                List<String> updatedMembers = existingMembers.stream()
+                        .filter(member -> !assignMembersRequest.getMembers().contains(member))
+                        .toList();
+                project.setMembers(updatedMembers);
+            }
+
             Project updatedProject = projectRepository.save(project);
             log.info("Users successfully assigned to project {}", projectId);
 
@@ -158,7 +190,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw e;
         } catch (Exception e) {
             log.error("Error assigning users to project {}", projectId, e);
-            throw new DataProcessingException("Failed to assign users to project", e);
+            throw new DataProcessingException(e.getMessage());
         }
     }
 

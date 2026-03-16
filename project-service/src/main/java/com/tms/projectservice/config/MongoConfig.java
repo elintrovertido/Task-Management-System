@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 @Configuration
 @RequiredArgsConstructor
-@EnableMongoAuditing
+@EnableMongoAuditing(auditorAwareRef = "auditorAwareImpl")
 @EnableMongoRepositories(basePackages = "com.tms.projectservice.repository")
 public class MongoConfig extends AbstractMongoClientConfiguration {
 

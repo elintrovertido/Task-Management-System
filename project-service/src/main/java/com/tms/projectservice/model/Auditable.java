@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+
 import java.time.LocalDateTime;
 
 @Data
@@ -19,7 +20,7 @@ public abstract class Auditable {
     private LocalDateTime createdAt;
 
     @CreatedBy
-    @Field(value = "updatedAt")
+    @Field(value = "createdBy")
     private String createdBy;
 
 }

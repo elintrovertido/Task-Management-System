@@ -1,5 +1,6 @@
 package com.tms.projectservice.service;
 
+import com.tms.projectservice.dto.AssignMembersRequest;
 import com.tms.projectservice.dto.ProjectRequest;
 import com.tms.projectservice.dto.ProjectResponse;
 
@@ -17,5 +18,5 @@ public interface ProjectService {
 
     void deleteProject(String id);
 
-    ProjectResponse assignUsersToProject(String projectId, List<String> members);
+    ProjectResponse assignUsersToProject(String projectId, AssignMembersRequest assignMembersRequest);
 }
