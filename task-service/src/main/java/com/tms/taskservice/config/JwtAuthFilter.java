@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;  // same JwtService, shared lib or copy
+    private final JwtService jwtService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -55,7 +55,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             // Use a simple principal holder
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                    email, "", authorities);
+                    username, "", authorities);
 
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(

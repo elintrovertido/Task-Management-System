@@ -1,12 +1,11 @@
 package com.tms.taskservice.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class CommentRequest {
 
-    private String userId;
-
+    @NotBlank
     private String message;
-
 }

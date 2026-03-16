@@ -3,28 +3,36 @@ package com.tms.taskservice.utils;
 import java.util.Set;
 
 public enum Roles {
+
     ADMIN(Set.of(
             Permissions.PROJECT_READ,
             Permissions.PROJECT_WRITE,
-            Permissions.USER_WRITE,
             Permissions.USER_READ,
+            Permissions.USER_WRITE,
             Permissions.TASK_READ,
             Permissions.TASK_WRITE
     )),
-    USER(Set.of(
+
+    PROJECT_MANAGER(Set.of(
             Permissions.PROJECT_READ,
             Permissions.PROJECT_WRITE,
+            Permissions.TASK_READ,
+            Permissions.TASK_WRITE
+    )),
+
+    USER(Set.of(
+            Permissions.PROJECT_READ,
             Permissions.TASK_READ,
             Permissions.TASK_WRITE
     ));
 
-   private final Set<Permissions> permissions;
+    private final Set<Permissions> permissions;
 
-   Roles(Set<Permissions> permissions){
-       this.permissions = permissions;
-   }
+    Roles(Set<Permissions> permissions){
+        this.permissions = permissions;
+    }
 
-   public Set<Permissions> getPermissions(){
-       return this.permissions;
-   }
+    public Set<Permissions> getPermissions(){
+        return permissions;
+    }
 }

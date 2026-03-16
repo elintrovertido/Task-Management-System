@@ -17,10 +17,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +34,8 @@ import java.util.UUID;
 public class TaskServiceImpl implements TaskService {
     
     private final TaskRepository taskRepository;
+
+    private final JwtService jwtService;
 
     @Override
     public TaskResponse createTask(TaskRequest request) {
@@ -110,6 +116,31 @@ public class TaskServiceImpl implements TaskService {
         } catch (Exception e) {
             log.error("Error assigning task {}", taskId, e);
             throw new TaskException("Failed to assign task");
+        }
+    }
+
+    public TaskResponse assignToMe(String taskId){
+        try {
+
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new ResourceNotFoundException(ApplicationConstants.TASK_NOT_FOUND));
+
+            String username = SecurityContextHolder
+                    .getContext()
+                    .getAuthentication()
+                    .getName();
+
+            task.setAssignedTo(username);
+
+            Task updatedTask = taskRepository.save(task);
+
+            log.info("Task {} assignedTo updated to {}", taskId, username);
+
+            return mapToResponse(updatedTask);
+
+        } catch (Exception e) {
+            log.error("Error updating status for task {}", taskId, e);
+            throw new TaskException("Failed to assign task to me");
         }
     }
 
@@ -205,9 +236,11 @@ public class TaskServiceImpl implements TaskService {
             Task task = taskRepository.findById(taskId)
                     .orElseThrow(() -> new ResourceNotFoundException(ApplicationConstants.TASK_NOT_FOUND));
 
+            String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+
             Comment comment = Comment.builder()
                     .commentId(UUID.randomUUID().toString())
-                    .userId(commentRequest.getUserId())
+                    .userId(userName)
                     .message(commentRequest.getMessage())
                     .createdAt(LocalDateTime.now())
                     .build();
@@ -226,7 +259,7 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
-    public void deleteComment(String taskId,String commentId){
+    public void deleteComment(String taskId, String commentId){
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException(ApplicationConstants.TASK_NOT_FOUND));
         List<Comment> commentList = task.getComments()
@@ -236,7 +269,7 @@ public class TaskServiceImpl implements TaskService {
 
         task.setComments(commentList);
         taskRepository.save(task);
-    };
+    }
 
     private TaskResponse mapToResponse(Task task) {
 

@@ -29,11 +29,10 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("username", user.getUserName());
         claims.put("email", user.getEmail());
-        claims.put("role", user.getRoles().name());  // store as String, not enum
-
+        claims.put("role", user.getRoles().name());
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(user.getEmail())          // use email as subject
+                .setSubject(user.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 15 * 60 * 1000))
                 .signWith(SignatureAlgorithm.HS256, getSigningKey())

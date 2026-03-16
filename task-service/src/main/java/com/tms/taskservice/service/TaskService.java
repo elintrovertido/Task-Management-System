@@ -16,6 +16,8 @@ public interface TaskService {
 
     TaskResponse assignTask(String taskId, String userId);
 
+    TaskResponse assignToMe(String taskId);
+
     TaskResponse updateStatus(String taskId, TaskStatus status);
 
     void deleteTask(String id);
